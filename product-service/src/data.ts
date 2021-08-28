@@ -4,7 +4,7 @@ export default [
         count: 1,
         description: "product 1 description",
         title: "product 1 title",
-        price: 123  
+        price: 123
     },
     {
         id: "alice",
