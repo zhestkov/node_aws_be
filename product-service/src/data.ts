@@ -7,7 +7,7 @@ export default [
         price: 123  
     },
     {
-        id: "Alice",
+        id: "alice",
         count: 5,
         description: "Childhood bestseller",
         title: "Alice in Wonderland",
