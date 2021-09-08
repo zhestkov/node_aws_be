@@ -2,7 +2,7 @@ import ProductInputValidationError from "src/exceptions/ProductInputValidationEx
 import ProductService from "src/services/product-service";
 import { ProductInput } from "./inputSchema";
 
-export const validateOnCreate = async (product: ProductInput) => {
+export const validateOnCreate = async (productService: ProductService, product: ProductInput) => {
     // check title/price/count
     if (product.title == null) {
         throw new ProductInputValidationError(`Title cannot be empty`);
@@ -13,7 +13,6 @@ export const validateOnCreate = async (product: ProductInput) => {
     }
 
     // check if product with such title already exists
-    const productService = new ProductService();
     const existedProduct = await productService.getProductByTitle(product.title);
     if (existedProduct != null) {
         throw new ProductInputValidationError(`Product with title = '${product.title}' already exists'`);

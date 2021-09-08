@@ -173,7 +173,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/product-service/dev/1631063286058-2021-09-08T01:08:06.058Z/product-service.zip"
+          "S3Key": "serverless/product-service/dev/1631067319804-2021-09-08T02:15:19.804Z/product-service.zip"
         },
         "Handler": "src/functions/get-products/handler.main",
         "Runtime": "nodejs14.x",
@@ -208,7 +208,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/product-service/dev/1631063286058-2021-09-08T01:08:06.058Z/product-service.zip"
+          "S3Key": "serverless/product-service/dev/1631067319804-2021-09-08T02:15:19.804Z/product-service.zip"
         },
         "Handler": "src/functions/get-product-by-id/handler.main",
         "Runtime": "nodejs14.x",
@@ -243,7 +243,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/product-service/dev/1631063286058-2021-09-08T01:08:06.058Z/product-service.zip"
+          "S3Key": "serverless/product-service/dev/1631067319804-2021-09-08T02:15:19.804Z/product-service.zip"
         },
         "Handler": "src/functions/post-product/handler.main",
         "Runtime": "nodejs14.x",
@@ -271,34 +271,34 @@
         "PostProductLogGroup"
       ]
     },
-    "GetProductsLambdaVersionLTmAB2IVWYtM6STPkFlZbsIcFDyC9JAMqHvpX6TOPI": {
+    "GetProductsLambdaVersionc3JKfpKSk4MynbvjjqOUL7LqJ4WtUiRIjK55GbQBM1w": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetProductsLambdaFunction"
         },
-        "CodeSha256": "Wutc24pUvBT3c2OOhc0pHgVgHJ1O+RD227LgWxkDrYw="
+        "CodeSha256": "EBFIwgkFM7IhZRKP9Lxd2fW755zIqol0JWSvcPIV+JI="
       }
     },
-    "GetProductByIdLambdaVersionwH4sAMe5WVvQ4nLSpMSkia18gDkDyBL9AGmk61PwBE": {
+    "GetProductByIdLambdaVersionxFg11BLPXTKXmjVk0KHkQqb8vK2mMt1tJOmD4zSlQ": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "GetProductByIdLambdaFunction"
         },
-        "CodeSha256": "Wutc24pUvBT3c2OOhc0pHgVgHJ1O+RD227LgWxkDrYw="
+        "CodeSha256": "EBFIwgkFM7IhZRKP9Lxd2fW755zIqol0JWSvcPIV+JI="
       }
     },
-    "PostProductLambdaVersionPnEtj4nJpCjZLUV7PAWTYJi4TnINFR1tS2usjiXp4": {
+    "PostProductLambdaVersion6zomFEwpQ5N1h0uFdeR6i7ukX3B1ZPRMhA9L7MdZs": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "PostProductLambdaFunction"
         },
-        "CodeSha256": "Wutc24pUvBT3c2OOhc0pHgVgHJ1O+RD227LgWxkDrYw="
+        "CodeSha256": "EBFIwgkFM7IhZRKP9Lxd2fW755zIqol0JWSvcPIV+JI="
       }
     },
     "ApiGatewayRestApi": {
@@ -569,7 +569,7 @@
         "PostProductLambdaPermissionApiGateway"
       ]
     },
-    "ApiGatewayDeployment1631063274354": {
+    "ApiGatewayDeployment1631067309554": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -709,7 +709,7 @@
     "GetProductsLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetProductsLambdaVersionLTmAB2IVWYtM6STPkFlZbsIcFDyC9JAMqHvpX6TOPI"
+        "Ref": "GetProductsLambdaVersionc3JKfpKSk4MynbvjjqOUL7LqJ4WtUiRIjK55GbQBM1w"
       },
       "Export": {
         "Name": "sls-product-service-dev-GetProductsLambdaFunctionQualifiedArn"
@@ -718,7 +718,7 @@
     "GetProductByIdLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "GetProductByIdLambdaVersionwH4sAMe5WVvQ4nLSpMSkia18gDkDyBL9AGmk61PwBE"
+        "Ref": "GetProductByIdLambdaVersionxFg11BLPXTKXmjVk0KHkQqb8vK2mMt1tJOmD4zSlQ"
       },
       "Export": {
         "Name": "sls-product-service-dev-GetProductByIdLambdaFunctionQualifiedArn"
@@ -727,7 +727,7 @@
     "PostProductLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "PostProductLambdaVersionPnEtj4nJpCjZLUV7PAWTYJi4TnINFR1tS2usjiXp4"
+        "Ref": "PostProductLambdaVersion6zomFEwpQ5N1h0uFdeR6i7ukX3B1ZPRMhA9L7MdZs"
       },
       "Export": {
         "Name": "sls-product-service-dev-PostProductLambdaFunctionQualifiedArn"

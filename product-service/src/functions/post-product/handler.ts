@@ -17,14 +17,16 @@ const postProduct: ValidatedEventAPIGatewayProxyEvent<typeof inputSchema> = asyn
   } as ProductInput;
   const productService = new ProductService();
   try {
-    await productService.createProduct(product);
-    return formatJSONResponse({message: "product created"});
+    const createdProduct = await productService.createProduct(product);
+    return formatJSONResponse(createdProduct);
   } catch(err) {
     if (err instanceof ProductInputValidationError) {
       return formatJSONErrorResponse(404, err.message);
     } else {
       return formatJSONErrorResponse(500, err.message);
     }
+  } finally {
+    await productService.closePool();
   }
 }
 

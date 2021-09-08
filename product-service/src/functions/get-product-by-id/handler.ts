@@ -18,6 +18,8 @@ const getProductById: ValidatedEventAPIGatewayProxyEvent<any> = async (event) =>
     } else {
       return formatJSONErrorResponse(500, err.message);
     }
+  } finally {
+    await productService.closePool();
   }
 }
 

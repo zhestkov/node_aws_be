@@ -15,6 +15,8 @@ const getProductList: ValidatedEventAPIGatewayProxyEvent<void> = async (event) =
     });
   } catch(err) {
     return formatJSONErrorResponse(500, err.message);
+  } finally {
+    await productService.closePool();
   }
 }
 

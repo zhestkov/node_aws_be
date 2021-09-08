@@ -1,60 +1,57 @@
 import { ProductInput } from '@functions/post-product/inputSchema';
 import { validateOnCreate } from '@functions/post-product/validators';
 import Utils from '@libs/utils';
-import { Client } from 'pg';
+import { Pool } from 'pg';
 import DatabaseError from 'src/exceptions/DatabaseException';
 import ProductNotFoundError from 'src/exceptions/ProductNotFoundException';
 
 export default class ProductService {
-  client: Client;
+  pool: Pool;
   
   constructor() {
-    this.client = new Client(Utils.getDbOptions());
+    this.pool = new Pool(Utils.getDbOptions())
   }
 
+  async closePool() {
+    await this.pool.end();
+  }
+
+
   async createProduct(product: ProductInput) {
-    // validateOnCreate(product);
+    await validateOnCreate(this, product);
+    const client = await this.pool.connect();
+    // todo: add transaction
     try {
       if (product.count == null) {
         product.count = 1;
       }
       const { title, price, description, count } = product;
-      console.log("product to save: ", product);
       const productQueryValues = [title, description, price];
-      await this.client.connect();
       // save product
-      await this.client.query(`
+      const createdProductId = (await client.query(`
       insert into product(title, description, price) values
-      ($1, $2, $3)
-      `, productQueryValues);
-
-      const createdProductId = (await this.client.query(`
-      select id
-      from product p
-      where p.title = $1
-      `, [title])).rows[0].id;
-
-      console.log("created product id", createdProductId);
+      ($1, $2, $3) returning id
+      `, productQueryValues)).rows[0].id;
 
       // save stock
       const stockQueryValues = [createdProductId, count];
-      await this.client.query(`
+      await client.query(`
       insert into stock(product_id, count) values
       ($1, $2)
       `, stockQueryValues);
-      // return this.getProductById(createdProductId);
+      return this.getProductById(createdProductId);
     } catch(err) {
-      console.log(err);
       throw new DatabaseError("Something went wrong while creating new product");
     } finally {
-      this.client.end();
+      client.release();
     }
   }
 
   async getProductList() {
+    const client = await this.pool.connect();
     try {
-      await this.client.connect();
-      const { rows: products } = await this.client.query(`
+      
+      const { rows: products } = await client.query(`
       select 
         p.id as id,
         p.title as title,
@@ -70,15 +67,15 @@ export default class ProductService {
     } catch(err) {
       throw new DatabaseError("Something went wrong while fetching product list from DB");
     } finally {
-      this.client.end();
+      client.release();
     }
   }
 
-  async getProductByTitle(title: string) {
+  async getProductWithStockByTitle(title: string) {
+    const client = await this.pool.connect();
     try {
-      await this.client.connect();
       const queryValues = [title];
-      const { rows: foundProducts } = await this.client.query(`
+      const { rows: foundProducts } = await client.query(`
       select 
         p.id as id,
         p.title as title,
@@ -94,20 +91,39 @@ export default class ProductService {
         ? foundProducts[0]
         : null;
     } catch(err) {
+      throw new DatabaseError("Something went wrong while searching full product info by title");
+    } finally {
+      client.release();
+    }
+  }
+
+  async getProductByTitle(title: string) {
+    const client = await this.pool.connect();
+    try {
+      const queryValues = [title];
+      const { rows: foundProducts } = await client.query(`
+      select * from product p
+      where p.title = $1
+      `, queryValues);
+      return foundProducts.length
+        ? foundProducts[0]
+        : null;
+    } catch(err) {
       throw new DatabaseError("Something went wrong while searching product by title");
     } finally {
-      this.client.end();
+      client.release();
     }
   }
 
   async getProductById(id: string) {
+    const client = await this.pool.connect();
     try {
       if (!Utils.isUUIDValid(id)) {
         throw new ProductNotFoundError(`Product with id = '${id}' was not found (invalid format)`);
       }
-      await this.client.connect();
+      
       const queryValues = [id];
-      const { rows } = await this.client.query(`
+      const { rows } = await client.query(`
       select 
         p.id as id,
         p.title as title,
@@ -131,7 +147,7 @@ export default class ProductService {
         throw new DatabaseError("Something went wrong while fetching product by ID");
       }
     } finally {
-      this.client.end();
+      client.release();
     }
   }
 }
