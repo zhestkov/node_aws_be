@@ -1,26 +1,23 @@
 import 'source-map-support/register';
-import type { ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
+import { formatJSONErrorResponse, ValidatedEventAPIGatewayProxyEvent } from '@libs/apiGateway';
 import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
-import { ProductNotFoundError } from './exceptions';
-import data from 'src/data';
+import ProductNotFoundError from 'src/exceptions/ProductNotFoundException';
+import ProductService from 'src/services/product-service';
 
 const getProductById: ValidatedEventAPIGatewayProxyEvent<any> = async (event) => {
+  console.log(event);
+  const productService = new ProductService();
   try {
     const id = event.pathParameters.id;
-    const product = data.find(p => p.id === id);
-    if (product == null) {
-      throw new ProductNotFoundError("Product not found");
-    }
+    const product = await productService.getProductById(id);
     return formatJSONResponse(product);
   } catch(err) {
-    const msg = err.message || "Uknown error type";
-    const statusCode = err instanceof ProductNotFoundError ? 400 : 500;
-    return formatJSONResponse({
-      statusCode,
-      description: msg
-    });
-    
+    if (err instanceof ProductNotFoundError) {
+      return formatJSONErrorResponse(404, err.message);
+    } else {
+      return formatJSONErrorResponse(500, err.message);
+    }
   }
 }
 
