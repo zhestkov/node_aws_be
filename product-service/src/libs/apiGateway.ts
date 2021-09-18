@@ -13,4 +13,16 @@ export const formatJSONResponse = (response: Record<string, unknown>) => {
       'Access-Control-Allow-Credentials': true
     }
   }
-}
+};
+
+export const formatJSONErrorResponse = (code: number, errorMessage: string) => ({
+  statusCode: code,
+  body: JSON.stringify({
+    code,
+    error: errorMessage
+  }),
+  headers: {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': true
+  }
+});
