@@ -1,14 +1,17 @@
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { S3ClientConfig, S3Client, PutObjectCommand, PutObjectCommandInput, GetObjectCommand, CopyObjectCommand  } from '@aws-sdk/client-s3';
-import { createReadStream, ReadStream } from 'fs';
+import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+import { ReadStream } from 'fs';
 import * as csvParser from 'csv-parser';
 
 const BUCKET = process.env.BUCKET;
 
 export default class ImportService {
     s3client: S3Client;
+    sqsClient: SQSClient;
     constructor(config: S3ClientConfig) {
         this.s3client = new S3Client(config);
+        this.sqsClient = new SQSClient(config);
     }
 
     async fetchSignedUrl(input: PutObjectCommandInput) {
@@ -19,14 +22,21 @@ export default class ImportService {
     async parseFile(records: any[]) {
         try {
             records.forEach(async (rec) => {
-                const getObjectCmd = new GetObjectCommand({ 
+                 const resp = await this.s3client.send(new GetObjectCommand({
                     Bucket: BUCKET,
                     Key: rec.s3.object.key
-                 });
-                 const resp = await this.s3client.send(getObjectCmd);
+                 }));
                  (resp.Body as ReadStream).pipe(csvParser())
-                    .on('data', data => {
-                        console.log(data);
+                    .on('data', async (data) => {
+                        console.log('on data:', data);
+                        const [title, description, price, count] = (Object.values(data)[0] as string).split(";");
+                        const product = {
+                            title,
+                            description,
+                            price: Number(price),
+                            count: Number(count)
+                        };
+                        await this.sendProductToSQS(product);
                     })
                     .on('end', async () => {
                         console.log(`Copy from ${BUCKET}/${rec.s3.object.key}`);
@@ -41,8 +51,15 @@ export default class ImportService {
             });
         } catch(err) {
             console.log('error:', err);
+            throw new Error("Error while parsing csv file");
         }
     }
 
-
+    async sendProductToSQS(data) {
+        console.log("Sending to SQS: ", data);
+        await this.sqsClient.send(new SendMessageCommand({
+            QueueUrl: process.env.SQS_URL,
+            MessageBody: JSON.stringify(data)
+        }));
+    }
 }
