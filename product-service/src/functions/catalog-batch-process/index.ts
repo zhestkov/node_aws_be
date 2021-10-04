@@ -5,14 +5,12 @@ export default {
     handler: `${handlerPath(__dirname)}/handler.main`,
     events: [
       {
-        s3: {
-          bucket: 'rscatalog-bucket',
-          event: 's3:ObjectCreated:*',
-          rules: [{
-            prefix: 'uploaded/',
-          }],
-          existing: true
-        }
-      },
+        sqs: {
+          batchSize: 5,
+          arn: {
+            'Fn::GetAtt': ['catalogItemsQueue', 'Arn']
+          }
+        } 
+      }
     ],
   } as AWS['functions']['string']

@@ -28,6 +28,11 @@ const serverlessConfiguration: AWS = {
         Effect: 'Allow',
         Action: [ 's3:*' ],
         Resource: [ 'arn:aws:s3:::${env:BUCKET}/*' ]
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sqs:*',
+        Resource: `\${cf:product-service-\${self:provider.stage}.createProductTopicArn}`,
       }
     ],
     apiGateway: {
@@ -36,7 +41,8 @@ const serverlessConfiguration: AWS = {
     },
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-      BUCKET: '${env:BUCKET}'
+      BUCKET: '${env:BUCKET}',
+      SQS_URL: `\${cf:product-service-\${self:provider.stage}.catalogItemsQueueUrl}`,
     },
     lambdaHashingVersion: '20201221',
   },
